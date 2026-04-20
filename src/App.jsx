@@ -4,8 +4,14 @@ import AuthPage from './pages/AuthPage'
 
 function MainApp() {
   return (
-    <div className="min-h-screen bg-gray-950 flex items-center justify-center">
+    <div className="min-h-screen bg-gray-950 flex flex-col items-center justify-center gap-4">
       <p className="text-white text-xl">You're in! Main app coming soon.</p>
+      <button
+        onClick={async () => { await supabase.auth.signOut() }}
+        className="text-gray-400 text-sm hover:text-white underline"
+      >
+        Log out
+      </button>
     </div>
   )
 }
@@ -20,7 +26,7 @@ export default function App() {
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       setSession(session)
-      if (event === 'SIGNED_IN' && session?.user) {
+      if ((event === 'SIGNED_IN' || event === 'INITIAL_SESSION') && session?.user) {
         const { id, user_metadata } = session.user
         await supabase.from('profiles').upsert(
           { user_id: id, name: user_metadata?.name ?? '', certifications: [] },
