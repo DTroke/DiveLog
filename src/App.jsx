@@ -1,17 +1,24 @@
 import { useEffect, useState } from 'react'
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { supabase } from './lib/supabase'
 import AuthPage from './pages/AuthPage'
+import DiveLogPage from './pages/DiveLogPage'
+import PokedexPage from './pages/PokedexPage'
+import MapPage from './pages/MapPage'
+import ProfilePage from './pages/ProfilePage'
+import BottomNav from './components/ui/BottomNav'
 
 function MainApp() {
   return (
-    <div className="min-h-screen bg-gray-950 flex flex-col items-center justify-center gap-4">
-      <p className="text-white text-xl">You're in! Main app coming soon.</p>
-      <button
-        onClick={async () => { await supabase.auth.signOut() }}
-        className="text-gray-400 text-sm hover:text-white underline"
-      >
-        Log out
-      </button>
+    <div className="min-h-screen bg-gray-950 flex flex-col pb-16">
+      <Routes>
+        <Route path="/log" element={<DiveLogPage />} />
+        <Route path="/pokedex" element={<PokedexPage />} />
+        <Route path="/map" element={<MapPage />} />
+        <Route path="/profile" element={<ProfilePage />} />
+        <Route path="*" element={<Navigate to="/log" replace />} />
+      </Routes>
+      <BottomNav />
     </div>
   )
 }
@@ -46,5 +53,13 @@ export default function App() {
     )
   }
 
-  return session ? <MainApp /> : <AuthPage />
+  if (!session) {
+    return <AuthPage />
+  }
+
+  return (
+    <BrowserRouter>
+      <MainApp />
+    </BrowserRouter>
+  )
 }
