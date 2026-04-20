@@ -18,8 +18,15 @@ export default function App() {
       setSession(session)
     })
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       setSession(session)
+      if (event === 'SIGNED_IN' && session?.user) {
+        const { id, user_metadata } = session.user
+        await supabase.from('profiles').upsert(
+          { user_id: id, name: user_metadata?.name ?? '', certifications: [] },
+          { onConflict: 'user_id', ignoreDuplicates: true }
+        )
+      }
     })
 
     return () => subscription.unsubscribe()

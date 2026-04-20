@@ -13,7 +13,11 @@ export default function SignupForm({ onSwitch }) {
     setLoading(true)
     setError(null)
 
-    const { data, error: signUpError } = await supabase.auth.signUp({ email, password })
+    const { error: signUpError } = await supabase.auth.signUp({
+      email,
+      password,
+      options: { data: { name } },
+    })
 
     if (signUpError) {
       setError(signUpError.message)
@@ -21,11 +25,7 @@ export default function SignupForm({ onSwitch }) {
       return
     }
 
-    const userId = data.user?.id
-    if (userId) {
-      await supabase.from('profiles').insert({ user_id: userId, name, certifications: [] })
-    }
-
+    setError('Check your email and click the confirmation link to finish signing up.')
     setLoading(false)
   }
 
@@ -59,7 +59,11 @@ export default function SignupForm({ onSwitch }) {
         className="bg-gray-800 text-white rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-teal-500 placeholder-gray-500"
       />
 
-      {error && <p className="text-red-400 text-sm">{error}</p>}
+      {error && (
+        <p className={`text-sm ${error.startsWith('Check') ? 'text-teal-400' : 'text-red-400'}`}>
+          {error}
+        </p>
+      )}
 
       <button
         type="submit"
