@@ -7,12 +7,17 @@ import PokedexPage from './pages/PokedexPage'
 import MapPage from './pages/MapPage'
 import ProfilePage from './pages/ProfilePage'
 import BottomNav from './components/ui/BottomNav'
+import DiveDetail from './components/dives/DiveDetail'
+import DiveForm from './components/dives/DiveForm'
 
 function MainApp() {
   return (
     <div className="min-h-screen bg-gray-950 flex flex-col pb-16">
       <Routes>
         <Route path="/log" element={<DiveLogPage />} />
+        <Route path="/log/new" element={<DiveForm />} />
+        <Route path="/log/:id/edit" element={<DiveForm />} />
+        <Route path="/log/:id" element={<DiveDetail />} />
         <Route path="/pokedex" element={<PokedexPage />} />
         <Route path="/map" element={<MapPage />} />
         <Route path="/profile" element={<ProfilePage />} />
