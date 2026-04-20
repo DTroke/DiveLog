@@ -1,15 +1,15 @@
 import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '../lib/supabase'
 
+async function getCurrentUserId() {
+  const { data: { session } } = await supabase.auth.getSession()
+  return session?.user?.id ?? null
+}
+
 export function useDives() {
   const [dives, setDives] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
-  const [userId, setUserId] = useState(null)
-
-  useEffect(() => {
-    supabase.auth.getUser().then(({ data: { user } }) => setUserId(user?.id ?? null))
-  }, [])
 
   const fetchDives = useCallback(async () => {
     setLoading(true)
@@ -24,13 +24,16 @@ export function useDives() {
   }, [])
 
   useEffect(() => {
-    if (userId) fetchDives()
-  }, [userId, fetchDives])
+    fetchDives()
+  }, [fetchDives])
 
   const addDive = async ({ diveData, selectedCreatures, photos }) => {
+    const userId = await getCurrentUserId()
+    if (!userId) throw new Error('Not authenticated. Please log out and log back in.')
+
     const { data: dive, error: diveError } = await supabase
       .from('dives')
-      .insert(diveData)
+      .insert({ ...diveData, user_id: userId })
       .select()
       .single()
     if (diveError) throw diveError
@@ -45,6 +48,8 @@ export function useDives() {
   }
 
   const updateDive = async ({ diveId, diveData, selectedCreatures, newPhotos, removedPhotoIds }) => {
+    const userId = await getCurrentUserId()
+
     const { error: updateError } = await supabase
       .from('dives').update(diveData).eq('id', diveId)
     if (updateError) throw updateError

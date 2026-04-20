@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { supabase } from './lib/supabase'
+import { AuthProvider } from './lib/AuthContext'
 import AuthPage from './pages/AuthPage'
 import DiveLogPage from './pages/DiveLogPage'
 import PokedexPage from './pages/PokedexPage'
@@ -63,8 +64,10 @@ export default function App() {
   }
 
   return (
-    <BrowserRouter>
-      <MainApp />
-    </BrowserRouter>
+    <AuthProvider>
+      <BrowserRouter>
+        <MainApp />
+      </BrowserRouter>
+    </AuthProvider>
   )
 }

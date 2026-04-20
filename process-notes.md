@@ -30,6 +30,49 @@
 
 *(in progress)*
 
+## /build
+
+### Step 4: Navigation Shell — 4-Tab Layout
+
+- Built BottomNav.jsx (fixed bottom tab bar, 4 tabs, teal active highlight, dark bg) and 4 placeholder page components (DiveLogPage, PokedexPage, MapPage, ProfilePage).
+- Rewrote App.jsx to wrap BrowserRouter inside the session check — routes only exist when logged in, providing structural auth protection.
+- Added catch-all route `<Navigate to="/log" />` so any unknown path lands on Dive Log.
+- Logout button added to ProfilePage placeholder (removed in step 3 cleanup, restored here — will be replaced properly in step 8).
+- Verification: Juan confirmed 4 tabs visible, tab switching works, active tab highlighted teal. Auth redirect test was done while logged in (correctly showed Pokédex tab — redirect only fires when logged out).
+- Comprehension check: "Why does BrowserRouter live inside the session check?" — Juan answered correctly: routes don't exist until logged in. First try.
+
+
+### Step 3: Auth — Login & Signup
+
+- Built AuthPage.jsx, LoginForm.jsx, SignupForm.jsx, rewrote App.jsx with auth gate and session spinner.
+- Bug encountered: profiles row wasn't being inserted after signup. Root cause: email confirmation is enabled in Supabase, so the auth session doesn't exist at signup time — the insert was getting blocked by RLS.
+- Fix: moved profile creation to the `onAuthStateChange` handler in App.jsx (fires on SIGNED_IN event, after email confirmation). Used upsert with ignoreDuplicates so it's safe to fire multiple times. Name passed via Supabase user_metadata at signup time.
+- Juan noticed the missing profiles row himself during verification — good catch, active engagement.
+- Juan chose to keep email confirmation on ("I think it's important") — correct instinct for a real product. Signup form now shows a teal "Check your email" message instead of an error.
+- Second bug: even after fix, upsert from JS client was failing silently (RLS blocked it). Root cause: `using`-only RLS policy doesn't reliably cover INSERT from the JS client. Fix: database trigger (`handle_new_user`) that auto-creates the profile row on auth.users insert — runs as security definer, bypasses RLS entirely. Trigger saved in 003_profile_trigger.sql.
+- Backfill SQL used to create the row for Juan's existing account. Row appeared with correct user_id; name was empty (account predates name-in-metadata fix) — acceptable, will be filled in via Profile screen in Step 8.
+- Comprehension check: Juan answered correctly — getSession() is async, spinner prevents flashing wrong screen.
+
+### Step 2: Database Schema + Creature Seed Data
+
+- Created supabase/migrations/001_initial_schema.sql with all 5 tables: profiles, dives, dive_photos, creatures, dive_creatures. Includes Row Level Security policies.
+- Created supabase/migrations/002_seed_creatures.sql with 60 marine species (no hardcoded UUIDs — let Supabase generate them).
+- Created src/data/creatures.js with matching 60-species array for frontend use.
+- Supabase account created fresh during this step — Juan had no prior account or GitHub. Signed up via email.
+- First SQL run (001) succeeded immediately. Second SQL run (002) had a syntax error on first attempt due to escaped single quotes in terminal output copy-paste; fixed by simplifying the insert to remove apostrophes in descriptions.
+- Learner verification: Table Editor confirmed 60 records in creatures table. All 5 tables visible.
+- Juan asked if more creatures can be added post-launch — confirmed yes, both via SQL and via the custom creature feature in the app.
+
+### Step 1: Project Setup
+
+- Scaffolded React + Vite (React 19, Vite 8). Node.js v24 was not installed — learner installed it via nodejs.org installer.
+- Installed: react-router-dom@6, @supabase/supabase-js, tailwindcss@3, @tailwindcss/vite, react-leaflet@5, leaflet@1.9.4. Used --legacy-peer-deps due to react-leaflet@4 peer conflict with React 19; resolved by upgrading to react-leaflet@5.
+- Created src/lib/supabase.js (Supabase client init from env vars).
+- Created .env.local with placeholder keys (covered by *.local in .gitignore).
+- Tailwind configured via @tailwindcss/vite plugin (v4-style, no tailwind.config.js needed).
+- Dev server confirmed running at http://localhost:5173 (HTTP 200).
+- Git initialized and first commit made.
+
 ## /checklist
 
 **Sequencing decisions:** Auth-first was Juan's instinct and correct — he immediately identified that the account system is the foundation everything links to. Full sequence: project setup → database schema → auth → navigation shell → dive log → Pokédex → map → profile → Devpost. Leaflet map placed in step 5 (Dive Log) deliberately — earliest point it appears, maximizes time to adapt if it causes trouble.

@@ -29,9 +29,11 @@ export default function DiveForm() {
   const [formError, setFormError] = useState(null)
 
   useEffect(() => {
-    supabase.from('creatures').select('*').order('name').then(({ data }) => {
-      setAllCreatures(data ?? [])
-    })
+    supabase.from('creatures').select('id, name, image_url').order('name')
+      .then(({ data, error }) => {
+        if (error) console.error('Creatures fetch error:', error)
+        else setAllCreatures(data ?? [])
+      })
   }, [])
 
   useEffect(() => {
@@ -100,7 +102,8 @@ export default function DiveForm() {
         navigate(`/log/${dive.id}`)
       }
     } catch (err) {
-      setFormError(err.message ?? 'Something went wrong. Please try again.')
+      console.error('Save dive error:', err)
+      setFormError(err?.message ?? err?.details ?? 'Something went wrong. Please try again.')
       setSaving(false)
     }
   }
@@ -124,6 +127,7 @@ export default function DiveForm() {
         </button>
         <h1 className="text-white text-xl font-bold">{isEdit ? 'Edit Dive' : 'Log a Dive'}</h1>
       </div>
+
 
       <form onSubmit={handleSubmit} className="space-y-5">
         {/* Date */}
@@ -195,7 +199,10 @@ export default function DiveForm() {
               onFocus={() => setShowDropdown(true)}
               className="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-3 text-white placeholder-gray-600"
             />
-            {showDropdown && (
+            {creaturesError && !showDropdown && (
+            <p className="text-yellow-500 text-xs mt-1">{creaturesError}</p>
+          )}
+          {showDropdown && (
               <div className="absolute z-20 w-full bg-gray-900 border border-gray-700 rounded-xl mt-1 max-h-52 overflow-y-auto shadow-xl">
                 {filteredCreatures.length === 0 ? (
                   <p className="text-gray-500 text-sm px-4 py-3">No creatures found</p>

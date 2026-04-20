@@ -10,31 +10,31 @@
 
 ## Checklist
 
-- [ ] **1. Project Setup**
+- [x] **1. Project Setup**
   Spec ref: `spec.md > Stack` and `spec.md > Runtime & Deployment`
   What to build: Scaffold a new React + Vite project. Install all dependencies: React Router v6, Tailwind CSS v3, Supabase JS client, React-Leaflet v5, and Leaflet 1.9.4. Set up `tailwind.config.js` and `vite.config.js`. Create `.env.local` with `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` placeholders. Create `src/lib/supabase.js` to initialize the Supabase client. Add `.env.local` to `.gitignore`. Confirm the dev server starts and the default Vite page loads.
   Acceptance: `npm run dev` runs without errors. Browser opens to `http://localhost:5173` and shows a page. All packages are installed with no dependency errors.
   Verify: Run `npm run dev` and confirm the browser loads without errors in the console.
 
-- [ ] **2. Database Schema + Creature Seed Data**
+- [x] **2. Database Schema + Creature Seed Data**
   Spec ref: `spec.md > Data Model` and `spec.md > Creature Catalog Seed Data`
   What to build: Create `supabase/migrations/001_initial_schema.sql` with all 5 table definitions: `profiles`, `dives`, `dive_photos`, `creatures`, `dive_creatures`. Run the migration in Supabase. Create `src/data/creatures.js` with a hardcoded array of 60 pre-built sea species (id, name, description, image_url — source images from iNaturalist public domain URLs). Write a seed script or SQL insert to populate the `creatures` table with these 60 species.
   Acceptance: All 5 tables exist in Supabase dashboard. The `creatures` table has 60 rows visible in the Supabase table editor. No SQL errors on migration run.
   Verify: Open Supabase dashboard → Table Editor → confirm all 5 tables exist and `creatures` has 60 rows.
 
-- [ ] **3. Auth — Login & Signup**
+- [x] **3. Auth — Login & Signup**
   Spec ref: `spec.md > Auth`
   What to build: Build `AuthPage.jsx` with two sub-components: `LoginForm.jsx` (email + password, calls `supabase.auth.signInWithPassword()`) and `SignupForm.jsx` (name, email, password, calls `supabase.auth.signUp()` then inserts a row into `profiles`). In `App.jsx`, check for an active Supabase session on load — if no session show `AuthPage`, if session exists show the main app (placeholder for now). Session should persist across browser refreshes.
   Acceptance: A new user can sign up with name, email, and password. After signup, they land on the main app placeholder. A returning user can log in and land on the same place. Refreshing the browser keeps the user logged in. A new row appears in Supabase `profiles` table after signup.
   Verify: Sign up with a new email → confirm you land on the main app. Refresh the browser → confirm you're still logged in. Open Supabase → `profiles` table → confirm a row exists with your user ID.
 
-- [ ] **4. Navigation Shell — 4-Tab Layout**
+- [x] **4. Navigation Shell — 4-Tab Layout**
   Spec ref: `spec.md > Navigation`
   What to build: Build `BottomNav.jsx` — a fixed bottom tab bar with 4 tabs: Dive Log, Pokédex, Map, Profile. Active tab highlighted in teal. Dark background. Set up React Router v6 with 4 routes, each rendering a placeholder page component (`DiveLogPage.jsx`, `PokedexPage.jsx`, `MapPage.jsx`, `ProfilePage.jsx`). Each placeholder just shows the tab name as a heading. Wrap all routes with the auth gate from step 3.
   Acceptance: After login, the app shows a bottom nav bar with 4 tabs. Tapping each tab navigates to a different screen showing its name. The active tab is highlighted. Unauthenticated users can't reach any tab — they're redirected to auth.
   Verify: Log in → confirm bottom nav appears with 4 tabs. Tap each tab → confirm the screen changes. Log out and try accessing a tab URL directly → confirm you're redirected to login.
 
-- [ ] **5. Dive Log — List, Add/Edit, Detail, Delete**
+- [x] **5. Dive Log — List, Add/Edit, Detail, Delete**
   Spec ref: `spec.md > Dive Log`
   What to build: Replace `DiveLogPage.jsx` placeholder with the full dive list: fetches all dives for the logged-in user sorted by date descending, renders `DiveCard.jsx` (dive number, date, location name), and shows an "Add Dive" floating action button. Build `DiveForm.jsx` with: date picker (defaults to today), location name text input, `LocationPicker.jsx` (small Leaflet map — tap to pin or "Use my location" button), creatures multi-select (searchable, from the creatures catalog), optional photo upload (up to 3, to Supabase Storage), optional comments text area. On save: insert into `dives`, upload photos, insert `dive_creatures` rows. Build `DiveDetail.jsx` showing all dive info: dive number, date, location name, mini Leaflet map with pin, creatures spotted with thumbnails, photos, comments. Add edit (pre-populates DiveForm) and delete (confirmation dialog with re-locking warning). Implement dive number calculation in `src/lib/diveUtils.js`. Build hooks: `useDives.js`. Implement creature re-locking logic on delete in the delete handler.
   Acceptance: Can log a new dive with date, location, pin on map, creatures, and optional photo. New dive appears in the list with the correct dive number. Dive numbers are chronological — not entry order. Tapping a dive shows full detail. Edit works. Delete shows the confirmation warning, removes the dive, and recalculates numbers. If a deleted dive was the only sighting of a creature, that creature reverts to locked.
