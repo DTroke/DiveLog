@@ -10,6 +10,8 @@ import ProfilePage from './pages/ProfilePage'
 import BottomNav from './components/ui/BottomNav'
 import DiveDetail from './components/dives/DiveDetail'
 import DiveForm from './components/dives/DiveForm'
+import CreatureDetail from './components/creatures/CreatureDetail'
+import CreatureForm from './components/creatures/CreatureForm'
 
 function MainApp() {
   return (
@@ -20,6 +22,8 @@ function MainApp() {
         <Route path="/log/:id/edit" element={<DiveForm />} />
         <Route path="/log/:id" element={<DiveDetail />} />
         <Route path="/pokedex" element={<PokedexPage />} />
+        <Route path="/pokedex/new" element={<CreatureForm />} />
+        <Route path="/pokedex/:id" element={<CreatureDetail />} />
         <Route path="/map" element={<MapPage />} />
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="*" element={<Navigate to="/log" replace />} />
