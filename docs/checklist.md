@@ -52,7 +52,7 @@
   Acceptance: Map screen shows a dark full-screen world map. Each logged dive with coordinates appears as a pin. Tapping a single-dive pin opens that dive's detail. Tapping a pin with multiple dives shows the list. Empty state (no dives) shows just the map with no pins. Map works on mobile browser.
   Verify: Log 2 dives at different locations → open Map → confirm 2 pins appear. Tap each pin → confirm it opens the right dive detail. Log another dive at the exact same coordinates as an existing dive → tap that pin → confirm it shows the list of both dives.
 
-- [ ] **8. Profile Screen**
+- [x] **8. Profile Screen**
   Spec ref: `spec.md > Profile`
   What to build: Replace `ProfilePage.jsx` placeholder with the full profile screen: loads from `profiles` table using current user's ID. Displays: profile photo (or placeholder avatar if none set), name, personal description, certifications (shown as badges), total dives logged, total creatures spotted, and current diver level. Total dives and creatures spotted are calculated live from the database on each load. Diver level calculated from total dive count using the level table in `src/lib/levelUtils.js`. Edit button enables inline editing of all fields (photo, name, description, certifications multi-select from the PADI list). Build hook: `useProfile.js`.
   Acceptance: Profile screen shows name, description, certifications as badges, total dives, total creatures spotted, and diver level. Stats update automatically after logging new dives or creatures without needing a refresh. Edit mode allows changing all fields. Profile photo uploads and displays. Diver level changes correctly as dive count crosses thresholds.

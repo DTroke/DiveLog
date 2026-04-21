@@ -1,7 +1,8 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import L from 'leaflet'
 import { MapContainer, TileLayer, Marker } from 'react-leaflet'
+import { supabase } from '../../lib/supabase'
 import { useDives } from '../../hooks/useDives'
 import { calculateDiveNumbers } from '../../lib/diveUtils'
 
@@ -20,6 +21,20 @@ export default function DiveDetail() {
   const { dives, loading, deleteDive } = useDives()
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const [deleting, setDeleting] = useState(false)
+  const [creatureDetails, setCreatureDetails] = useState({})
+
+  useEffect(() => {
+    const dive = dives.find(d => d.id === id)
+    if (!dive?.dive_creatures?.length) return
+    const ids = dive.dive_creatures.map(dc => dc.creature_id)
+    supabase.from('creatures').select('id, name, image_url').in('id', ids).then(({ data }) => {
+      if (data) {
+        const map = {}
+        data.forEach(c => { map[c.id] = c })
+        setCreatureDetails(map)
+      }
+    })
+  }, [id, dives])
 
   if (loading) {
     return (
@@ -99,18 +114,17 @@ export default function DiveDetail() {
               Creatures Spotted ({dive.dive_creatures.length})
             </p>
             <div className="flex flex-wrap gap-2">
-              {dive.dive_creatures.map(dc => (
-                <div key={dc.id} className="flex items-center gap-2 bg-gray-800 rounded-lg px-3 py-1.5">
-                  {dc.creatures?.image_url && (
-                    <img
-                      src={dc.creatures.image_url}
-                      alt={dc.creatures?.name}
-                      className="w-6 h-6 rounded-full object-cover"
-                    />
-                  )}
-                  <span className="text-white text-sm">{dc.creatures?.name}</span>
-                </div>
-              ))}
+              {dive.dive_creatures.map(dc => {
+                const creature = creatureDetails[dc.creature_id]
+                return (
+                  <div key={dc.id} className="flex items-center gap-2 bg-gray-800 rounded-lg px-3 py-1.5">
+                    {creature?.image_url && (
+                      <img src={creature.image_url} alt={creature.name} className="w-6 h-6 rounded-full object-cover" />
+                    )}
+                    <span className="text-white text-sm">{creature?.name ?? '...'}</span>
+                  </div>
+                )
+              })}
             </div>
           </div>
         )}

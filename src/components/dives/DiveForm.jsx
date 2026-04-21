@@ -46,9 +46,12 @@ export default function DiveForm() {
         setLng(dive.longitude)
         setComments(dive.comments ?? '')
         setExistingPhotos(dive.dive_photos ?? [])
-        setSelectedCreatures(
-          dive.dive_creatures?.map(dc => dc.creatures).filter(Boolean) ?? []
-        )
+        const creatureIds = dive.dive_creatures?.map(dc => dc.creature_id).filter(Boolean) ?? []
+        if (creatureIds.length) {
+          supabase.from('creatures').select('id, name, image_url').in('id', creatureIds).then(({ data }) => {
+            if (data) setSelectedCreatures(data)
+          })
+        }
       }
     }
   }, [isEdit, id, dives])
@@ -199,9 +202,6 @@ export default function DiveForm() {
               onFocus={() => setShowDropdown(true)}
               className="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-3 text-white placeholder-gray-600"
             />
-            {creaturesError && !showDropdown && (
-            <p className="text-yellow-500 text-xs mt-1">{creaturesError}</p>
-          )}
           {showDropdown && (
               <div className="absolute z-20 w-full bg-gray-900 border border-gray-700 rounded-xl mt-1 max-h-52 overflow-y-auto shadow-xl">
                 {filteredCreatures.length === 0 ? (

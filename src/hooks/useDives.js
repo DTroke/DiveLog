@@ -12,15 +12,20 @@ export function useDives() {
   const [error, setError] = useState(null)
 
   const fetchDives = useCallback(async () => {
-    setLoading(true)
-    const { data, error } = await supabase
-      .from('dives')
-      .select('*, dive_photos(*), dive_creatures(*, creatures(*))')
-      .order('date', { ascending: false })
-
-    if (error) setError(error)
-    else setDives(data ?? [])
-    setLoading(false)
+    try {
+      setLoading(true)
+      const { data, error } = await supabase
+        .from('dives')
+        .select('id, date, location_name, latitude, longitude, comments, created_at, dive_photos(id, photo_url), dive_creatures(id, creature_id)')
+        .order('date', { ascending: false })
+      if (error) throw error
+      setDives(data ?? [])
+    } catch (err) {
+      setError(err)
+      setDives([])
+    } finally {
+      setLoading(false)
+    }
   }, [])
 
   useEffect(() => {

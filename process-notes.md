@@ -101,6 +101,16 @@
 
 ## /build
 
+### Step 8: Profile Screen
+
+**What was built:** `src/lib/levelUtils.js` (diver level lookup — 8 tiers, 0–1000+). `src/hooks/useProfile.js` (fetches profile row, live dive count via Supabase count query, live creature count via distinct creature_ids from dive_creatures). `src/pages/ProfilePage.jsx` — full profile screen with: avatar (tap to change in edit mode), name, level badge (teal pill), two-stat row (Dives / Creatures), About description, certification badges (PADI 12-item multi-select in edit mode), Edit Profile button (inline toggle, no separate page), and logout link. Build: 0 errors.
+
+**Verification:** Juan confirmed: stats appear correctly, total dives incremented and decremented automatically after logging/deleting a dive, name edit saved correctly, certifications and bio updated correctly. All flows passed first try.
+
+**Comprehension check:** "Where does the stats number come from each time the screen loads?" — Juan answered correctly: counted live from dives and dive_creatures tables. First try.
+
+**Issues encountered:** None.
+
 ### Step 7: Dive Map
 
 **What was built:** Full-screen dark Leaflet map (CartoDB Dark Matter tiles) in `MapPage.jsx`. Fetches all user dives via `useDives`, groups by exact coordinates, places pins. Single-dive pin navigates directly to `/log/:id` via `eventHandlers`. Multi-dive pin opens a Leaflet `Popup` listing all dives with dive numbers and location names; tapping any opens that dive's detail.
