@@ -98,3 +98,40 @@
 **Prior SDD experience:** Solid. Planned a complex paper packaging quotation system upfront — machine-specific logic, pricing databases, cost modeling. Has felt the pain of missing info mid-build. Understands value of planning but hasn't done it in a formal/structured way before.
 
 **Energy and engagement:** High motivation, clear goals, honest self-assessment. Knows what he doesn't know. Good candidate for learning — will respond well to practical framing and business-relevant examples.
+
+## /build
+
+### Step 7: Dive Map
+
+**What was built:** Full-screen dark Leaflet map (CartoDB Dark Matter tiles) in `MapPage.jsx`. Fetches all user dives via `useDives`, groups by exact coordinates, places pins. Single-dive pin navigates directly to `/log/:id` via `eventHandlers`. Multi-dive pin opens a Leaflet `Popup` listing all dives with dive numbers and location names; tapping any opens that dive's detail.
+
+**Verification:** Juan confirmed map loads with dark tiles, pins appear at logged dive locations, and tapping pins opens correct dive detail.
+
+**Comprehension check:** "What happens when you tap a pin with only one dive?" — Juan answered correctly: opens dive detail directly. First try.
+
+**Issues encountered:** None.
+
+### Step 6: Creature Pokédex + Custom Creatures
+
+**What was built:** Full Pokédex module — `useCreatures` hook (fetch all creatures + sightings, unlock logic, addSighting, addCustomCreature), `CreatureCard` (grid card with grayscale filter for locked), `CreatureDetail` (locked/unlocked states, inline "Log a sighting" form with dive dropdown + optional photo), `CreatureForm` (add custom creature with spotted toggle), `PokedexPage` (2-column grid, progress counter, search bar, "show only spotted" toggle, FAB). Routes added to App.jsx.
+
+**Issues encountered:** iNaturalist photo IDs in seed data were placeholder/incorrect — Barracuda showed a crab drawing, Blue Tang showed a woodpecker. Fixed by querying iNaturalist `/v1/taxa` API for all 60 species and running a SQL UPDATE migration (006_fix_creature_images.sql) with verified photo URLs.
+
+**Verification:** Pokédex grid loads with real creature photos. Progress counter shows correct unlocked count. 3 creatures from prior dives show in full color. Juan confirmed success after running the image fix SQL. Some images may be slightly imprecise — Juan noted he can fix individual ones later via SQL.
+
+**Learner observations:** Juan noticed some images didn't match perfectly — good eye for detail. Confirmed he knows how to fix them with a single SQL UPDATE.
+
+### Step 5: Dive Log — List, Add/Edit, Detail, Delete
+
+**What was built:** Full dive log module — `useDives` hook (fetch/add/update/delete), `DiveCard`, `DiveForm` (add/edit with Leaflet map pin, creature multi-select, photo upload), `DiveDetail` (read-only view with mini map, creature chips, photo grid, delete confirmation), `DiveLogPage` (list + FAB), `LocationPicker`, `diveUtils.calculateDiveNumbers`. Routes wired in `App.jsx`.
+
+**Issues encountered:**
+- Missing `user_id` in dive insert (NOT NULL constraint) — fixed by passing userId explicitly.
+- Creatures returning 0 rows silently — root cause was missing SQL GRANTs on tables. Fixed with `005_grant_permissions.sql` + `NOTIFY pgrst, 'reload schema'`.
+- Persistent spinner on page refresh — went through three approaches (onAuthStateChange broken with React StrictMode, getSession timing race, getUser with active flag). Final fix: removed auth gate entirely from useDives — App.jsx already guarantees authenticated context.
+- Blank page on DiveForm — `creaturesError` variable referenced in JSX but never declared. Removed the dead code.
+- Spinner in regular browser window only — traced to browser extension (ad blocker/VPN) intercepting Supabase requests. Works correctly in incognito. Not a code issue.
+
+**Verification:** Juan confirmed all four flows in incognito window — list loads, new dive added with correct number, edited dive updated with number recalculation, deleted dive disappeared. Dive with earlier date correctly assigned lower number.
+
+**Learner observations:** Juan noted dive numbers automatically recalculated when he edited the date — understood that ordering is computed at render time, not stored. Good intuition catch.
