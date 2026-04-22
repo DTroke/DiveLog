@@ -1,5 +1,14 @@
 # Process Notes
 
+### Step 9: Submit Your Project to Devpost
+
+- GitHub repo created at github.com/DTroke/DiveLog — public, all code pushed successfully.
+- App deployed to Vercel at dive-log-vert.vercel.app — login confirmed working in production.
+- Added vercel.json with SPA rewrite rules to fix React Router on direct URL navigation.
+- App works correctly in incognito (browser extension — ad blocker/VPN — interferes in regular mode).
+- Devpost submission skipped at learner's request.
+- Screenshots taken from live app (Pokédex, Map, Profile) for portfolio use.
+
 ## /scope
 
 **How the idea evolved:** Juan arrived with a semi-formed idea — a "sea creature Pokédex" for divers. Through conversation it expanded into a full three-module app (dive log, creature tracker, map view) and briefly into a full social network (Strava for divers). The core unlock mechanic (gray silhouette → full color) emerged organically from Juan, not from prompting — it's the strongest differentiator in the product.
