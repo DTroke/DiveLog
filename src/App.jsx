@@ -37,12 +37,8 @@ export default function App() {
   const [session, setSession] = useState(undefined)
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session)
-    })
-
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      setSession(session)
+      setSession(session ?? null)
       if ((event === 'SIGNED_IN' || event === 'INITIAL_SESSION') && session?.user) {
         const { id, user_metadata } = session.user
         await supabase.from('profiles').upsert(
